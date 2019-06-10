@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itheima.mapper.UserMapper">
+
+
+    <!--  <select id="findByCondition" parameterType="user" resultType="user">
+          select * from User where id=#{id} and username=#{username} and password=#{password}
+      </select>-->
+
+    <sql id="selectUser">
+		select * from User
+	</sql>
+    <!--<include refid="selectUser"></include>-->
+
+    <select id="findByCondition" parameterType="user" resultType="user">
+        <include refid="selectUser"></include>
+        <where>
+            <if test="id!=null">
+                and id=#{id}
+            </if>
+            <if test="username!=null and username!=''">
+                and username=#{username}
+            </if>
+            <if test="password!=null and password!=''">
+                and password=#{password}
+            </if>
+            <!--
+                >或者>=都可用
+                <或者<= 用
+                    <![CDATA[  and birthday <= #{birthday}  ]]>
+                    或者 &lt;=  等于<=
+                    &lt;  等于<
+            -->
+            <if test="birthday!=null">
+                and birthday >= #{birthday}
+
+            </if>
+        </where>
+
+    </select>
+
+    <select id="findByIds" parameterType="java.util.ArrayList" resultType="user">
+        <include refid="selectUser"></include>
+        <where>
+            <foreach collection="array" open="id in(" close=")" item="id" separator=",">
+                #{id}
+            </foreach>
+        </where>
+    </select>
+
+
+    <update id="update" parameterType="user">
+        update User
+        <set>
+            <if test="username!=null and username!=''">
+                username =#{username},
+            </if>
+            <if test="password!=null and password!=''">
+                password =#{password} ,
+            </if>
+        </set>
+        where id =#{id}
+    </update>
+
+
+
+
+
+
+    <select id="callProcedure" parameterType="map" statementType="CALLABLE">
+          {
+             call p_yearsal(
+                   #{p1,mode=IN,jdbcType=NUMERIC},
+                   #{p2,mode=OUT,jdbcType=NUMERIC}
+             )
+          }
+    </select>
+    <select id="callFunction" parameterType="map" statementType="CALLABLE">
+          {
+              #{p2,mode=OUT,jdbcType=NUMERIC}=call
+              	f_yearsal(
+				#{p1,mode=IN,jdbcType=NUMERIC}
+			  )
+          }
+  </select>
+
+
+</mapper>
